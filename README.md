@@ -16,9 +16,9 @@ The app is written in Rust using [egui](https://github.com/emilk/egui/) and [efr
 Note, the JS wrapper is set up to cache the Wasm app which cause problem when developing. The caching can be bypassed by requesting the `index.html#dev` page.
 
 
-## Compialtion - Local
+## Compilation - Local
 
-The [eframe](https://github.com/emilk/egui/tree/master/crates/eframe) framework also supports being compiled down to an ordinary desktop app. This is can be done via normal cargo commands, e.g., `cargo run`, `cargo build --release` etc.
+The [eframe](https://github.com/emilk/egui/tree/master/crates/eframe) framework also supports being compiled down to an ordinary desktop app. This can be done via normal cargo commands, e.g., `cargo run`, `cargo build --release` etc.
 
 However, on Linux you need to first run:
 
