@@ -1,9 +1,13 @@
 #![warn(clippy::all, rust_2018_idioms)]
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")] // hide console window on Windows in release
 
-// When compiling natively:
+use basic_print::basic_print;
+
+// Application startin points for the two targets
 #[cfg(not(target_arch = "wasm32"))]
 fn main() {
+    basic_print("Starting up...");
+
     // Log to stdout (if you run with `RUST_LOG=debug`).
     tracing_subscriber::fmt::init();
 
@@ -15,9 +19,10 @@ fn main() {
     );
 }
 
-// when compiling to web using trunk.
 #[cfg(target_arch = "wasm32")]
 fn main() {
+    basic_print("Starting up...");
+
     // Make sure panics are logged using `console.error`.
     console_error_panic_hook::set_once();
 
