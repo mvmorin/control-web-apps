@@ -6,13 +6,13 @@ use basic_print::basic_print; // basic print for print-debugging
 
 pub struct ControlApp {
     cur_app_idx: Option<usize>,
-    apps: Vec<(String,SubApp)>,
+    apps: Vec<Box<dyn CentralApp>>,
 }
 
-#[derive(PartialEq)]
-enum SubApp {
-    PolePos,
-    FreqResp,
+trait CentralApp {
+    fn draw_app(&mut self, ui: &mut egui::Ui);
+
+    fn get_label(&self) -> &str;
 }
 
 impl ControlApp {
@@ -20,11 +20,18 @@ impl ControlApp {
         // This is also where you can customized the look at feel of egui using
         // `cc.egui_ctx.set_visuals` and `cc.egui_ctx.set_fonts`.
 
-        let pp = ("Pole Positioning".to_string(), SubApp::PolePos);
-        let fr = ("Frequency Response".to_string(), SubApp::FreqResp);
+        let apps: Vec<Box<dyn CentralApp>> = vec![
+            Box::new(PolePos{
+                label: "Pole Positioning".to_string(),
+            }),
+            Box::new(FreqResp{
+                label: "Frequency Response".to_string(),
+            }),
+        ];
 
-        ControlApp{cur_app_idx: None, apps: vec![pp,fr] }
+        ControlApp{cur_app_idx: None, apps }
     }
+
 
     fn top_bar(&mut self, ui: &mut egui::Ui) -> bool {
         #[allow(unused_mut)]
@@ -34,12 +41,12 @@ impl ControlApp {
             ui.heading("Control Apps");
             ui.separator();
 
-            for (idx, (label, _app)) in self.apps.iter().enumerate() {
+            for (idx, app) in self.apps.iter().enumerate() {
                 let checked = match self.cur_app_idx {
                     Some(cur) => cur == idx,
                     None => false,
                 };
-                if ui.selectable_label(checked, label).clicked() {
+                if ui.selectable_label(checked, app.get_label()).clicked() {
                     if checked {
                         self.cur_app_idx = None;
                     } else {
@@ -67,6 +74,7 @@ impl ControlApp {
 
 }
 
+
 impl eframe::App for ControlApp {
 
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
@@ -80,11 +88,45 @@ impl eframe::App for ControlApp {
         egui::CentralPanel::default().show(ctx, |ui| {
             ui.centered_and_justified( |ui| {
                 match self.cur_app_idx {
-                    Some(idx) => ui.label(self.apps[idx].0.to_string()),
-                    None => ui.label("Select an application in the bar above."),
+                    None => {ui.label("Select an application in the bar above.");},
+                    Some(idx) => {self.apps[idx].draw_app(ui);},
                 };
             });
         });
+    }
+}
+
+
+
+
+struct PolePos{
+    label: String,
+}
+
+impl CentralApp for PolePos {
+    fn draw_app(&mut self, ui: &mut egui::Ui) {
+        ui.label("In app, Pole Pos");
+    }
+
+    fn get_label(&self) -> &str {
+        &self.label
+    }
+}
+
+
+
+
+struct FreqResp{
+    label: String,
+}
+
+impl CentralApp for FreqResp {
+    fn draw_app(&mut self, ui: &mut egui::Ui) {
+        ui.label("Frequency response app currently not implemented.");
+    }
+
+    fn get_label(&self) -> &str {
+        &self.label
     }
 }
 
