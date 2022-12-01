@@ -333,8 +333,14 @@ mod pole_position {
                         ui.end_row();
 
                         let Vec2{x,y} = ui.available_size();
-                        let width = x;
-                        let height = y/2.0;
+                        let mut width = x;
+                        let mut height = y/2.0;
+
+                        if width >= height*1.75 {
+                            width = height*1.75
+                        } else {
+                            height = width/1.75
+                        }
 
                         self.pole_plot(ui, width, height);
                         ui.end_row();
@@ -355,21 +361,15 @@ mod pole_position {
                     height = width/1.75
                 }
 
-
                 egui::Grid::new("app_grid")
                     .num_columns(2)
                     .show(ui, |ui| {
 
-                        ui.allocate_ui_with_layout(
-                            Vec2{x: width, y: height},
-                            Layout::top_down(Align::Center),
-                            |ui| {
-                                ui.vertical(|ui| {
-                                    self.order_selection(ui);
-                                    ui.add_space(20.0);
-                                    self.parameter_sliders(ui);
-                                });
-                            });
+                        ui.vertical(|ui| {
+                            self.order_selection(ui);
+                            ui.add_space(20.0);
+                            self.parameter_sliders(ui);
+                        });
 
                         self.pole_plot(ui, width, height);
 
