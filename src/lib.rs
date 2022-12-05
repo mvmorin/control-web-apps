@@ -509,7 +509,7 @@ mod tf_plots {
                     width,
                     height,
                     w_bounds_exp.clone(),
-                    -PI / 2.0..PI / 2.0,
+                    -PI / 0.95..PI / 7.0,
                     |plot| plot,
                     |plot_ui| {
                         plot_ui.line(phase_data.color(Color32::RED).style(LineStyle::Solid));

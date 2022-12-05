@@ -92,8 +92,8 @@ impl TransferFunction for SecondOrderSystem {
             1.0 - (w * t).cos()
         } else if (0.0 < d) && (d < 1.0) {
             let d_1_sqrt = (1.0 - d.powi(2)).sqrt();
-            let th = d_1_sqrt.asin();
-            1.0 - ((-w * t).exp()) * ((w * t + th).sin()) / d_1_sqrt
+            let w_d = w*d_1_sqrt;
+            1.0 - ( (-d*w*t).exp() ) * ( (w_d*t).cos() ) - ( (-d*w*t).exp() ) * ( (w_d*t).sin() ) * d / d_1_sqrt
         } else if d == 1.0 {
             1.0 - ((-w * t).exp()) * (1.0 + w * t)
         } else {
@@ -103,12 +103,23 @@ impl TransferFunction for SecondOrderSystem {
         }
     }
 
-    fn bode_amplitude(&self, _w: f64) -> f64 {
-        1.0
+    fn bode_amplitude(&self, w: f64) -> f64 {
+        let (d, wp) = (self.d, self.w);
+
+        wp.powi(2) / ( ( (wp.powi(2) - w.powi(2)).powi(2) + (2f64*d*wp*w).powi(2) ).sqrt() )
     }
 
-    fn bode_phase(&self, _w: f64) -> f64 {
-        0.0
+    fn bode_phase(&self, w: f64) -> f64 {
+        use std::f64::consts::PI;
+
+        let (d, wp) = (self.d, self.w);
+
+        let ph = -( (2f64*d*wp*w)/(wp.powi(2) - w.powi(2))  ).atan();
+        if ph > 0.0 {
+            ph - PI
+        } else {
+            ph
+        }
     }
 
     fn adjust_poles_to(&mut self, _re: f64, _im: f64) {}
