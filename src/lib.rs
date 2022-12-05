@@ -145,8 +145,8 @@ mod pole_position_app {
                 label,
                 order: Order::First,
                 display: Display::StepResponse,
-                fo: FirstOrderSystem { T: 1.0 },
-                so: SecondOrderSystem { d: 0.5, w: 0.75 },
+                fo: FirstOrderSystem { T: 1.0, T_lower: 0.1, T_upper: 500.0},
+                so: SecondOrderSystem { d: 0.5, w: 0.75, d_lower: 0.01, d_upper: 5.0, w_lower: 0.01, w_upper: 5.0},
                 pole_drag_offset: None,
             }
         }
@@ -223,15 +223,15 @@ mod pole_position_app {
                 Order::First => {
                     ui.heading("G(s) = 1/(sT - 1)");
                     ui.add(
-                        egui::Slider::new(&mut self.fo.T, 0.2..=100.0)
+                        egui::Slider::new(&mut self.fo.T, self.fo.T_lower..=self.fo.T_upper)
                             .text("T")
                             .logarithmic(true),
                     );
                 }
                 Order::Second => {
                     ui.heading("G(s) = ω^2/(s^2 + 2δωs+ ω^2)");
-                    ui.add(egui::Slider::new(&mut self.so.d, 0.0..=1.5).text("δ"));
-                    ui.add(egui::Slider::new(&mut self.so.w, 0.0..=2.0).text("ω"));
+                    ui.add(egui::Slider::new(&mut self.so.d, self.so.d_lower..=self.so.d_upper).text("δ"));
+                    ui.add(egui::Slider::new(&mut self.so.w, self.so.w_lower..=self.so.w_upper).text("ω"));
                 }
             };
         }
@@ -384,11 +384,12 @@ mod tf_plots {
     {
         // Plot params
         let cross_radius = 10.0;
-        let re_bounds = -3.0..1.0;
-        let im_bounds = -1.0..1.0;
+        let re_bounds = -3.55..1.1;
+        let im_bounds = -1.5..1.5;
 
-        // Plot data
-        let data = Points::new(tf.poles());
+        // Plot points
+        let points = tf.poles();
+        let data = Points::new(points);
         let unit_circle = Line::new(PlotPoints::from_parametric_callback(
             |t| (t.sin(), t.cos()),
             0.0..(2.0 * PI),
@@ -429,7 +430,7 @@ mod tf_plots {
 
         // Calculate plot bounds
         let t_bounds = (0.0 - t_end * pad_ratio)..(t_end + t_end * pad_ratio);
-        let y_bounds = (0.0 - pad_ratio)..(1.0 + pad_ratio);
+        let y_bounds = (0.0 - pad_ratio)..(1.5 + pad_ratio);
 
         // Calc plot data
         let step = (t_bounds.end - t_bounds.start) / ((n_samples - 1) as f64);
@@ -463,8 +464,8 @@ mod tf_plots {
     ) -> (bool, Option<(f64, f64)>, bool, Option<(f64, f64)>)
     {
         // Plot params
-        let n_samples = 100;
-        let w_bounds_exp = -4.0..2.0;
+        let n_samples = 200;
+        let w_bounds_exp = -3.0..2.0;
 
         // Calc plot data
         let step = (w_bounds_exp.end - w_bounds_exp.start) / ((n_samples - 1) as f64);
@@ -497,7 +498,7 @@ mod tf_plots {
                     width,
                     height,
                     w_bounds_exp.clone(),
-                    -4.0..5f64.log10(),
+                    -4.0..15f64.log10(),
                     |plot| plot,
                     |plot_ui| {
                         plot_ui.line(amp_data.color(Color32::RED).style(LineStyle::Solid));
@@ -509,7 +510,7 @@ mod tf_plots {
                     width,
                     height,
                     w_bounds_exp.clone(),
-                    -PI / 0.95..PI / 7.0,
+                    -PI / 0.95..PI / 4.0,
                     |plot| plot,
                     |plot_ui| {
                         plot_ui.line(phase_data.color(Color32::RED).style(LineStyle::Solid));

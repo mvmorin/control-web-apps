@@ -14,6 +14,8 @@ pub struct FirstOrderSystem {
     // pole = -1/T
     // https://www.tutorialspoint.com/control_systems/control_systems_response_first_order.htm
     pub T: f64,
+    pub T_lower: f64,
+    pub T_upper: f64,
 }
 
 impl TransferFunction for FirstOrderSystem {
@@ -38,7 +40,7 @@ impl TransferFunction for FirstOrderSystem {
     }
 
     fn adjust_poles_to(&mut self, re: f64, _im: f64) {
-        let pole_bound = -0.01;
+        let pole_bound = -1.0/self.T_upper;
 
         if re >= pole_bound {
             self.T = -1.0 / pole_bound;
@@ -52,12 +54,15 @@ impl TransferFunction for FirstOrderSystem {
 
 #[derive(Debug, Clone, Copy)]
 pub struct SecondOrderSystem {
-    // TODO fix this, the step response is not corerct
     // second order system w^2/(s^2 + 2dw s + w^2)
     // poles = -dw +- w sqrt(d^2 - 1)
     // https://www.tutorialspoint.com/control_systems/control_systems_response_second_order.htm
     pub d: f64,
     pub w: f64,
+    pub d_lower: f64,
+    pub d_upper: f64,
+    pub w_lower: f64,
+    pub w_upper: f64,
 }
 
 impl TransferFunction for SecondOrderSystem {
