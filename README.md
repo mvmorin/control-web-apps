@@ -1,6 +1,6 @@
 # Control Web Applications
 
-Simple web apps to demonstrate basic control theory.
+Simple web apps to demonstrate basic control theory. Try it [here](https://mvmorin.github.io/control_web_apps/).
 
 # Development
 
