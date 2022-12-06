@@ -127,5 +127,38 @@ impl TransferFunction for SecondOrderSystem {
         }
     }
 
-    fn adjust_poles_to(&mut self, _re: f64, _im: f64) {}
+    fn adjust_poles_to(&mut self, re: f64, im: f64) {
+        if re >= 0.0 {
+            return
+        }
+
+        let mut d_new = self.d;
+        let w_new;
+
+        if self.d < 1.0 {
+            // two complex poles
+            let (re2, im2) = (re.powi(2), im.powi(2));
+            d_new = (re2/(re2+im2)).sqrt();
+            w_new = -re/d_new;
+        } else if self.d == 1.0 {
+            w_new = -re;
+            // real double pole
+        } else {
+            // two real poles
+            let d2 = self.d.powi(2);
+            let fast = -self.d*self.w + self.w*(d2 - 1.0).sqrt();
+            let slow = -self.d*self.w - self.w*(d2 - 1.0).sqrt();
+
+            if (re - fast).abs() < (re - slow).abs() {
+                w_new = re/( -self.d + (d2-1.0).sqrt() );
+            } else {
+                w_new = re/( -self.d - (d2-1.0).sqrt() );
+            }
+        }
+
+        if self.d_lower <= d_new && self.d_upper >= d_new && self.w_lower <= w_new && self.w_upper >= w_new {
+            self.d = d_new;
+            self.w = w_new;
+        }
+    }
 }

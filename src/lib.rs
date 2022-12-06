@@ -161,21 +161,7 @@ mod pole_position_app {
 
             // Handle dragging
             if dragged {
-                let (re_off, im_off) = match self.pole_drag_offset {
-                    Some((x, y)) => (x, y),
-                    None => {
-                        // We have just started to drag, find offset to closest pole so we don't jump
-                        //
-                        // For now, just assume we want to place the pole where we click
-                        self.pole_drag_offset = Some((0.0, 0.0));
-                        (0.0, 0.0)
-                    }
-                };
-
-                if let Some((re,im)) = pointer_coordinate {
-                    // This should never fail
-                    let (re, im) = (re + re_off, im + im_off);
-
+                if let Some((re,im)) = pointer_coordinate { // This should never fail
                     match self.order {
                         Order::First => self.fo.adjust_poles_to(re, im),
                         Order::Second => self.so.adjust_poles_to(re, im),
