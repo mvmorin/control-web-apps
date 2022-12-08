@@ -480,7 +480,7 @@ mod tf_plots {
                 let height = (height - ui.spacing().item_spacing.y) / 2.0;
                 let (amp_dragged, amp_pointer) = plot_show(
                     ui,
-                    "Bode Plote - Amplitude",
+                    "Bode Plot - Amplitude",
                     width,
                     height,
                     w_bounds_exp.clone(),
@@ -492,7 +492,7 @@ mod tf_plots {
                     );
                 let (ph_dragged, ph_pointer) = plot_show(
                     ui,
-                    "Bode Plote - Phase",
+                    "Bode Plot - Phase",
                     width,
                     height,
                     w_bounds_exp.clone(),
